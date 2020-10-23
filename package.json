@@ -1,0 +1,26 @@
+{
+  "name": "top-twitch-clips",
+  "version": "1.0.0",
+  "description": "This is a project to get top 10 clips from the top 100 users each day and upload them to youtube.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://GustavWalter@bitbucket.org/GustavWalt/top-twitch-clips.git"
+  },
+  "keywords": [
+    "twitch",
+    "clips",
+    "youtube"
+  ],
+  "author": "Gustav Walter",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/GustavWalt/top-twitch-clips#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "cloudflare-scraper": "^1.0.7",
+    "puppeteer": "^5.3.1"
+  }
+}
