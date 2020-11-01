@@ -126,8 +126,7 @@ async function main() {
 
   //Getting the object and logging it.
   const userClipInfoObject = await Promise.all(userClipRequests);
-  console.log(userClipInfoObject[0][0].clipTitle);
-
+  console.log(userClipInfoObject);
 }
 
 main();
