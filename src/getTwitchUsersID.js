@@ -18,7 +18,7 @@ var options = {
 
 //Required packages
 const fs = require('fs');
-var axios = require("axios").default;
+const axios = require("axios").default;
 const clientId = options.data.client_id;
 
 //Function to fetch my access token
@@ -94,6 +94,12 @@ async function fetchTwitchUserClip(userId, accessToken, clientId) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+/////////////FUNCTIONS FOR GETTING THE THUMBNAIL / MP4//////////////////
+/////////////FUNCTIONS FOR GETTING THE THUMBNAIL / MP4//////////////////
+/////////////FUNCTIONS FOR GETTING THE THUMBNAIL / MP4//////////////////
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
 //////////////////MAIN FUNCTION WHER EIT ALL RUNS///////////////////////
 //////////////////MAIN FUNCTION WHER EIT ALL RUNS///////////////////////
 //////////////////MAIN FUNCTION WHER EIT ALL RUNS///////////////////////
@@ -127,6 +133,18 @@ async function main() {
   //Getting the object and logging it.
   const userClipInfoObject = await Promise.all(userClipRequests);
   console.log(userClipInfoObject);
+
+  //Download the mp4
+  for(var i = 0; i < userClipInfoObject.length; i++){
+    const response = await axios.get(userClipInfoObject[i][0].clipMp4Url, { responseType: "stream" });
+    response.data.pipe(fs.createWriteStream("../videos/video" + i + ".mp4"));
+  }
+
+  //Download the thumbnail
+  for(var i = 0; i < userClipInfoObject.length; i++){
+    const response = await axios.get(userClipInfoObject[i][0].clipThumbnail, { responseType: "stream" });
+    response.data.pipe(fs.createWriteStream("../youtube-data/thumbnail" + i + ".jpg"));
+  }
 }
 
 main();
