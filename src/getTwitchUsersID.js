@@ -72,7 +72,7 @@ const yesterday = date.toISOString();
 //Function to fetch the twich user clips
 async function fetchTwitchUserClip(userId, accessToken, clientId) {
   const response = await axios.get(
-    `https://api.twitch.tv/helix/clips?broadcaster_id=${userId}&first=5&started_at=${yesterday}&ended_at=${today}`,
+    `https://api.twitch.tv/helix/clips?broadcaster_id=${userId}&first=1&started_at=${yesterday}&ended_at=${today}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -80,15 +80,17 @@ async function fetchTwitchUserClip(userId, accessToken, clientId) {
       },
     }
   );
-  var clipInfo = [];
-  const clipUrl = response.data.data?.[0]?.url;
-  const clipTitle = response.data.data?.[0]?.title;
-  clipInfo.push(clipUrl);
-  clipInfo.push(clipTitle);
-  if (!clipInfo) {
-    console.error(`Could not fetch clipInfo for person: ${userId}`);
-  }
-  return clipInfo ?? undefined;
+
+  if(!response.data) throw new Error("No clips returned!");
+
+  const clipInfo = response.data.data.map(({ thumbnail_url, title }) => ({
+    clipTitle: title,
+    clipMp4Url: `${thumbnail_url.replace(/-preview-\d+x\d+.\w+/, '')}.mp4`,
+    clipThumbnail: thumbnail_url
+
+  }));
+
+  return clipInfo;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,14 +119,14 @@ async function main() {
   // Now wait till all requests finished and you have an array of all user ids
   const twitchUserIds = await Promise.all(userIdRequests);
 
+  //Getting the requested data and pushing it into a object
   for (const userId of twitchUserIds){
     userClipRequests.push(fetchTwitchUserClip(userId, accessToken, clientId));
   }
 
-  const userClipInfo = await Promise.all(userClipRequests);
-  console.log(userClipInfo[0][1]);
-  
-
+  //Getting the object and logging it.
+  const userClipInfoObject = await Promise.all(userClipRequests);
+  console.log(userClipInfoObject[0][0].clipTitle);
 
 }
 
