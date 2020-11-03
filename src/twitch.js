@@ -29,7 +29,7 @@ async function fetchAccessToken() {
 
 //Getting the usernames of twitch top list in a object
 function fetchTopTwitchUsers() {
-  const jsonData = JSON.parse(fs.readFileSync('../top-twitch-users.json', { encoding: 'utf8' }));
+  const jsonData = JSON.parse(fs.readFileSync('../twitch-data/top-twitch-users.json', { encoding: 'utf8' }));
   return jsonData.topTwitchUsers;
 }
 
@@ -133,19 +133,21 @@ async function main() {
   //Getting the object and creating a clipTitle object and getting the description
   const userClipInfoObject = await Promise.all(userClipRequests);
   var clipTitle = {};
-  const clipDescription = (fs.readFileSync('../description.txt', { encoding: 'utf8' }));
+  const clipDescription = (fs.readFileSync('../twitch-data/description.txt', { encoding: 'utf8' }));
 
   //Saving the title in the object
   for (var i = 0; i < userClipInfoObject.length; i++) {
     clipTitle[i] = { title: userClipInfoObject[i][0].clipTitle, description: clipDescription };
   }
 
-  //Saving the object title to a json file
+  //Saving the description and title to a json file
   for (var i = 0; i < userClipInfoObject.length; i++) {
-    fs.writeFile('../youtube-data/title_desc.json', JSON.stringify(clipTitle), err => {
+    fs.writeFile('../twitch-data/_video' + [i] + '.json', JSON.stringify(clipTitle[i]), err => {
       if (err) {
         console.error(err)
         return
+      } else {
+        console.log("Fetching metadata");
       }
     })
   }
@@ -154,6 +156,7 @@ async function main() {
   for (var i = 0; i < userClipInfoObject.length; i++) {
     const response = await axios.get(userClipInfoObject[i][0].clipMp4Url, { responseType: "stream" });
     response.data.pipe(fs.createWriteStream("../youtube-data/video" + i + ".mp4"));
+    console.log("Fetching twitch clips");
   }
 
   //Download the thumbnail

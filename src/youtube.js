@@ -1,4 +1,5 @@
 var fs = require('fs');
+const path = require('path');
 var readline = require('readline');
 var { google } = require('googleapis');
 var OAuth2 = google.auth.OAuth2;
@@ -95,26 +96,26 @@ function storeToken(token) {
     });
 }
 
-//Object to store my data for the uploaded youtube video
-var metadata = {
-    Snippet: {
-        Title: 'Video title',
-        Description: 'Description',
-        Tags: 'Tags',
-        CategoryId: '22'
-    },
-    Status: {
-        PrivacyStatus: 'public'
-    },
-};
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+///////////////////////////MY CODE//////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
-var filePath = '../youtube-data/video0.mp4';
+//Get title and description data
+const twitchDataPath = '../twitch-data';
+const [firstTwitchDataPathFilename] = fs.readdirSync(twitchDataPath).filter(filename => filename.startsWith('_video'));
+const firstTwitchDataPath = path.join(twitchDataPath, firstTwitchDataPathFilename);
+
+const firstTwitchData = JSON.parse(fs.readFileSync(firstTwitchDataPath, { encoding: 'utf8' }));
+
+//Get videos
+const youtubeDataPath = '../youtube-data';
+const [firstYoutubeDataPathFileName] = fs.readdirSync(youtubeDataPath).filter(filename => filename.startsWith('video'));
+const firstYoutubeDataPath = path.join(youtubeDataPath, firstYoutubeDataPathFileName);
+console.log(firstYoutubeDataPath);
+
 const service = google.youtube('v3');
-/**
- * Lists the names and IDs of up to 10 files.
- *
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
 const uploadVideo = (auth) => {
     service.videos.insert(
         {
@@ -123,18 +124,16 @@ const uploadVideo = (auth) => {
             resource: {
                 // Video title and description
                 snippet: {
-                    title: 'My title',
-                    description: 'My description'
+                    title: firstTwitchData.title,
+                    description: firstTwitchData.description
                 },
                 // I set to private for tests
                 status: {
-                    privacyStatus: 'private'
+                    privacyStatus: 'public'
                 }
             },
-
-            // Create the readable stream to upload the video
             media: {
-                body: fs.createReadStream('../youtube-data/video1.mp4') // Change here to your real video
+                body: fs.createReadStream(firstYoutubeDataPath)
             }
         },
         (error, data) => {
@@ -146,3 +145,5 @@ const uploadVideo = (auth) => {
         }
     );
 };
+/* fs.unlinkSync(firstTwitchDataPath);
+fs.unlinkSync(firstYoutubeDataPath); */
