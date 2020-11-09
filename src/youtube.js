@@ -145,5 +145,8 @@ const uploadVideo = (auth) => {
         }
     );
 };
-/* fs.unlinkSync(firstTwitchDataPath);
-fs.unlinkSync(firstYoutubeDataPath); */
+
+setTimeout(() => {
+    fs.unlinkSync(firstTwitchDataPath);
+    fs.unlinkSync(firstYoutubeDataPath);
+}, 120000);
