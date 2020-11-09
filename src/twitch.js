@@ -164,6 +164,7 @@ async function main() {
     const response = await axios.get(userClipInfoObject[i][0].clipThumbnail, { responseType: "stream" });
     response.data.pipe(fs.createWriteStream("../youtube-data/thumbnail" + i + ".jpg"));
   }
+  process.exit();
 }
 
 main();
