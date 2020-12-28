@@ -94,10 +94,11 @@ async function fetchTwitchUserClip(userId, accessToken, clientId) {
   if (!response.data) throw new Error("No clips returned!");
 
   logger.info("Saving the object data");
-  const clipInfo = response.data.data.map(({ thumbnail_url, title }) => ({
+  const clipInfo = response.data.data.map(({ thumbnail_url, title, view_count }) => ({
     clipTitle: title,
     clipMp4Url: `${thumbnail_url.replace(/-preview-\d+x\d+.\w+/, '')}.mp4`,
-    clipThumbnail: thumbnail_url
+    clipThumbnail: thumbnail_url,
+    view_count: view_count
   }));
   logger.info("Successfully saved the object data");
 
@@ -195,6 +196,10 @@ async function main() {
     if(!userClipInfoObject?.[i]?.[0]?.clipMp4Url){
         continue;
     }
+
+    if(userClipInfoObject?.[i]?.[0]?.view_count < 1000){
+      continue;
+    }
     const response = await axios.get(userClipInfoObject[i][0].clipMp4Url, { responseType: "stream" });
     logger.info("Create write stream to the file system");
     response.data.pipe(fs.createWriteStream("/home/pi/top-twitch-clips/youtube-data/video" + i + ".mp4"));
@@ -208,6 +213,10 @@ async function main() {
     logger.info("Axios request to get thumbnail");
     if(!userClipInfoObject?.[i]?.[0]?.clipThumbnail){
         continue;
+    }
+
+    if(userClipInfoObject?.[i]?.[0]?.view_count < 1000){
+      continue;
     }
     const response = await axios.get(userClipInfoObject[i][0].clipThumbnail, { responseType: "stream" });
     logger.info("Create write stream to the file system");
